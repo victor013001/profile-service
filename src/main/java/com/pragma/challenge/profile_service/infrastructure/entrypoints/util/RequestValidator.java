@@ -1,4 +1,4 @@
-package com.pragma.challenge.profile_service.infrastructure.util;
+package com.pragma.challenge.profile_service.infrastructure.entrypoints.util;
 
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.standard_exception.BadRequest;
 import jakarta.validation.ConstraintViolation;

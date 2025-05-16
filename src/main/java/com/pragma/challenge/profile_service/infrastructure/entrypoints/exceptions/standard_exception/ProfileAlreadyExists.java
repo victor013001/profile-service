@@ -3,8 +3,10 @@ package com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptio
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardException;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.ServerResponses;
 
-public class BadRequest extends StandardException {
-  public BadRequest() {
-    super(ServerResponses.BAD_REQUEST.getHttpStatus(), ServerResponses.BAD_REQUEST.getMessage());
+public class ProfileAlreadyExists extends StandardException {
+  public ProfileAlreadyExists() {
+    super(
+        ServerResponses.PROFILE_ALREADY_EXISTS.getHttpStatus(),
+        ServerResponses.PROFILE_ALREADY_EXISTS.getMessage());
   }
 }
