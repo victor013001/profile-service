@@ -1,5 +1,5 @@
 spring:
   application:
-    name: archetype-gradle
+    name: profile-service
   profiles:
     active: ${ACTIVE_PROFILE}

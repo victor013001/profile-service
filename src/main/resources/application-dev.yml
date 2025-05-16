@@ -1,8 +1,6 @@
 spring:
-  application:
-    name: archetype-gradle
   webflux:
-    base-path: /archetype
+    base-path: /profile-service
   r2dbc:
     url: r2dbc:${DB}://${DB_URL}:${DB_PORT}/${DB_SCHEMA}
     username: ${DB_USERNAME}

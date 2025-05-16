@@ -1,4 +1,4 @@
-package com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.exceptions;
+package com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions;
 
 import java.time.LocalDateTime;
 import lombok.Getter;

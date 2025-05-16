@@ -1,4 +1,4 @@
-package com.pragma.challenge.archetype_gradle.infrastructure.util;
+package com.pragma.challenge.profile_service.infrastructure.util;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

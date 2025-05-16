@@ -44,6 +44,7 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 	compileOnly 'org.projectlombok:lombok:1.18.24'
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
 
 	//DATABASE
 	runtimeOnly 'org.postgresql:postgresql'
@@ -54,7 +55,8 @@ dependencies {
 	//TESTING
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
 
 	//TEST CONTAINER
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'

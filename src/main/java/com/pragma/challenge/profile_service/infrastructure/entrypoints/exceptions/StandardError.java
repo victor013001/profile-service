@@ -1,4 +1,4 @@
-package com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.exceptions;
+package com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.pragma.challenge.archetype_gradle;
+package com.pragma.challenge.profile_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

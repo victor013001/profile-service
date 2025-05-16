@@ -1,6 +1,6 @@
-package com.pragma.challenge.archetype_gradle.infrastructure.util;
+package com.pragma.challenge.profile_service.infrastructure.util;
 
-import com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.exceptions.standard_exception.BadRequest;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.standard_exception.BadRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.List;

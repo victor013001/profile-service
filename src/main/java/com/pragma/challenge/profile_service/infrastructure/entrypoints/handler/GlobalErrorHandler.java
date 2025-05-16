@@ -1,11 +1,11 @@
-package com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.handler;
+package com.pragma.challenge.profile_service.infrastructure.entrypoints.handler;
 
 import java.time.LocalDateTime;
 
-import com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.exceptions.StandardError;
-import com.pragma.challenge.archetype_gradle.infrastructure.entrypoints.exceptions.StandardException;
-import com.pragma.challenge.archetype_gradle.infrastructure.util.DefaultServerResponseContext;
-import com.pragma.challenge.archetype_gradle.infrastructure.util.ServerResponses;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardError;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardException;
+import com.pragma.challenge.profile_service.infrastructure.util.DefaultServerResponseContext;
+import com.pragma.challenge.profile_service.infrastructure.util.ServerResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
