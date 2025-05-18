@@ -6,5 +6,5 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DefaultServerResponseMapper {
-  com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse<Object> toResponse(Object data);
+  DefaultServerResponse<Object> toResponse(Object data);
 }
