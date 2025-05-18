@@ -5,7 +5,7 @@ import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.Profi
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.ProfileMapper;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.RequestValidator;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.ServerResponses;
+import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

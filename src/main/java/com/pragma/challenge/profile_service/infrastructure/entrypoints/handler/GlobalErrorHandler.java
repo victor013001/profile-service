@@ -2,10 +2,10 @@ package com.pragma.challenge.profile_service.infrastructure.entrypoints.handler;
 
 import java.time.LocalDateTime;
 
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardError;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardException;
+import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
+import com.pragma.challenge.profile_service.domain.exceptions.StandardException;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.DefaultServerResponseContext;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.ServerResponses;
+import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
@@ -23,13 +23,13 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class GlobalErrorHandler implements ErrorWebExceptionHandler {
-  private static final String LOG_PREFIX = "[ERROR_HANDLER] >>> ";
+  private static final String LOG_PREFIX = "[ERROR_HANDLER] >>>";
 
   private final DefaultServerResponseContext serverResponseContext;
 
   @Override
   public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-    log.info(
+    log.error(
         "{} Exception {} caught. Caused by: {}",
         LOG_PREFIX,
         ex.getClass().getSimpleName(),
@@ -60,6 +60,7 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
   private StandardError buildStandardError(ServerResponses serverResponses) {
     return StandardError.builder()
+        .code(serverResponses.getCode())
         .description(serverResponses.getMessage())
         .timestamp(LocalDateTime.now())
         .build();

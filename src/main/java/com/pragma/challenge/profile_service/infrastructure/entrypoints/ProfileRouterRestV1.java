@@ -1,7 +1,7 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints;
 
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.exceptions.StandardError;
+import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
