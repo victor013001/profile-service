@@ -64,7 +64,6 @@ class ProfileHandlerImplTest {
         .verifyComplete();
   }
 
-
   @Test
   void shouldReturnMonoErrorWhenRequestInvalid() {
     var technologyDto = getInvalidProfileDto();

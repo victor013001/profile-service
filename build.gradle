@@ -58,6 +58,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:4.1.2'
 
     //TEST CONTAINER
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
