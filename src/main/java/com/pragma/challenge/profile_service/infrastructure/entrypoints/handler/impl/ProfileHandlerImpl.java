@@ -41,15 +41,13 @@ public class ProfileHandlerImpl implements ProfileHandler {
               return profileServicePort
                   .registerProfile(profileMapper.toProfile(profileDto))
                   .doOnSuccess(
-                      profile -> {
-                        log.info(
-                            "{} {} with id: {} name: {} and description: {}.",
-                            LOG_PREFIX,
-                            ServerResponses.PROFILE_CREATED.getMessage(),
-                            profile.id(),
-                            profile.name(),
-                            profile.description());
-                      });
+                      profile -> log.info(
+                          "{} {} with id: {} name: {} and description: {}.",
+                          LOG_PREFIX,
+                          ServerResponses.PROFILE_CREATED.getMessage(),
+                          profile.id(),
+                          profile.name(),
+                          profile.description()));
             })
         .flatMap(
             ignore ->
