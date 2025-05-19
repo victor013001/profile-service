@@ -13,6 +13,7 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
 
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,7 +124,33 @@ public class ProfileRouterRestIT {
             exchangeResult -> {
               var error = exchangeResult.getResponseBody();
               assertNotNull(error);
-              assertEquals(ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(), error.getDescription());
+              assertEquals(
+                  ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(), error.getDescription());
+            });
+  }
+
+  @Test
+  void getProfiles() {
+    WireMock.stubFor(
+        WireMock.get(WireMock.urlPathEqualTo(TECHNOLOGY_SERVICE_PATH))
+            .withQueryParam(Constants.PROFILE_ID_PARAM, WireMock.matching(".*"))
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("findTechnologiesByProfileId.json")));
+
+    webTestClient
+        .get()
+        .uri(BASE_PATH)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DefaultServerResponse.class)
+        .consumeWith(
+            exchangeResult -> {
+              var error = exchangeResult.getResponseBody();
+              assertNotNull(error);
+              System.out.println(error);
             });
   }
 }

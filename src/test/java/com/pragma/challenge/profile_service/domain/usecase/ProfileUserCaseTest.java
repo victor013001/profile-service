@@ -5,7 +5,7 @@ import com.pragma.challenge.profile_service.domain.exceptions.standard_exception
 import com.pragma.challenge.profile_service.domain.model.Profile;
 import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

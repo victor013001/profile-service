@@ -10,6 +10,7 @@ public class ProfileData {
   }
 
   public static Profile getProfileWithoutId() {
-    return new Profile(null, "Backend", "Backend developer with React and AWS", List.of(1L, 2L, 3L));
+    return new Profile(
+        null, "Backend", "Backend developer with React and AWS", List.of(1L, 2L, 3L));
   }
 }

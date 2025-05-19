@@ -3,14 +3,18 @@ package com.pragma.challenge.profile_service.domain.usecase;
 import com.pragma.challenge.profile_service.domain.api.ProfileServicePort;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.TechnologiesNotFound;
 import com.pragma.challenge.profile_service.domain.model.Profile;
+import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
 import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileDto;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileRelationDto;
+import com.pragma.challenge.profile_service.domain.mapper.ProfileTechnologyMapper;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileRelation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -24,6 +28,7 @@ public class ProfileUserCase implements ProfileServicePort {
   private final ProfilePersistencePort profilePersistencePort;
   private final TechnologyServiceGateway technologyServiceGateway;
   private final TransactionalOperator transactionalOperator;
+  private final ProfileTechnologyMapper profileTechnologyMapper;
 
   @Override
   public Mono<Profile> registerProfile(Profile profile) {
@@ -31,6 +36,20 @@ public class ProfileUserCase implements ProfileServicePort {
         .validName(profile.name())
         .then(Mono.defer(() -> registerWithTechnologies(profile)))
         .as(transactionalOperator::transactional);
+  }
+
+  @Override
+  public Flux<ProfileTechnology> getProfiles(PageRequest pageRequest) {
+    return profilePersistencePort
+        .findAllBy(pageRequest)
+        .flatMap(
+            profileTechnology ->
+                technologyServiceGateway
+                    .getTechnologies(profileTechnology.id())
+                    .map(
+                        technologies ->
+                            profileTechnologyMapper.toProfileTechnologyWithTechnologies(
+                                profileTechnology, technologies)));
   }
 
   private Mono<Profile> registerWithTechnologies(Profile profile) {
@@ -55,7 +74,7 @@ public class ProfileUserCase implements ProfileServicePort {
     return technologyServiceGateway.createRelation(
         new TechnologyProfileDto(
             technologiesIds.stream()
-                .map(technologyId -> new TechnologyProfileRelationDto(technologyId, profileId))
+                .map(technologyId -> new TechnologyProfileRelation(technologyId, profileId))
                 .toList()));
   }
 }
