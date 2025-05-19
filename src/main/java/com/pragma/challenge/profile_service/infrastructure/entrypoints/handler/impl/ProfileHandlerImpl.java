@@ -3,6 +3,7 @@ package com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.
 import com.pragma.challenge.profile_service.domain.api.ProfileServicePort;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.DefaultServerResponseMapper;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.ProfileMapper;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.RequestValidator;
 import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
@@ -17,11 +18,12 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class ProfileHandlerImpl implements ProfileHandler {
-  private static final String LOG_PREFIX = "[Profile_Handler] >>> ";
+  private static final String LOG_PREFIX = "[PROFILE_HANDLER] >>> ";
 
   private final ProfileServicePort profileServicePort;
   private final ProfileMapper profileMapper;
   private final RequestValidator requestValidator;
+  private final DefaultServerResponseMapper defaultServerResponseMapper;
 
   @Override
   public Mono<ServerResponse> createProfile(ServerRequest request) {
@@ -51,6 +53,8 @@ public class ProfileHandlerImpl implements ProfileHandler {
         .flatMap(
             ignore ->
                 ServerResponse.status(ServerResponses.PROFILE_CREATED.getHttpStatus())
-                    .bodyValue(ServerResponses.PROFILE_CREATED.getMessage()));
+                    .bodyValue(
+                        defaultServerResponseMapper.toResponse(
+                            ServerResponses.PROFILE_CREATED.getMessage())));
   }
 }
