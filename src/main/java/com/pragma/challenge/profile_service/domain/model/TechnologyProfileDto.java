@@ -1,4 +1,4 @@
-package com.pragma.challenge.profile_service.infrastructure.entrypoints.dto;
+package com.pragma.challenge.profile_service.domain.model;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -9,4 +9,4 @@ public record TechnologyProfileDto(
     @Valid
         @NotNull(message = "The relations list is mandatory.")
         @Size(min = 1, message = "The relations list must contain at least one element.")
-        List<TechnologyProfileRelationDto> relations) {}
+        List<TechnologyProfileRelation> relations) {}

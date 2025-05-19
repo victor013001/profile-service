@@ -1,5 +1,6 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints.util;
 
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.BadRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;

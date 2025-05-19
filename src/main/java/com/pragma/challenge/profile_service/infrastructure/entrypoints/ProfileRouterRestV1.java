@@ -3,7 +3,7 @@ package com.pragma.challenge.profile_service.infrastructure.entrypoints;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
 import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Constants;
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.SwaggerResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,7 +49,7 @@ public class ProfileRouterRestV1 {
                 responses = {
                   @ApiResponse(
                       responseCode = "201",
-                      description = "The profile was created successfully.",
+                      description = Constants.PROFILE_CREATED_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -59,28 +59,28 @@ public class ProfileRouterRestV1 {
                                           SwaggerResponses.DefaultMessageResponse.class))),
                   @ApiResponse(
                       responseCode = "400",
-                      description = "Unable to process the request with the given data.",
+                      description = Constants.BAD_REQUEST_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
                               schema = @Schema(implementation = StandardError.class))),
                   @ApiResponse(
                       responseCode = "404",
-                      description = "Technologies provided not found.",
+                      description = Constants.TECHNOLOGIES_NOT_FOUND_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
                               schema = @Schema(implementation = StandardError.class))),
                   @ApiResponse(
                       responseCode = "409",
-                      description = "Conflict with the given data.",
+                      description = Constants.PROFILE_ALREADY_EXISTS_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
                               schema = @Schema(implementation = StandardError.class))),
                   @ApiResponse(
                       responseCode = "500",
-                      description = "An unexpected error occurred on the server.",
+                      description = Constants.SERVER_ERROR_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -99,13 +99,11 @@ public class ProfileRouterRestV1 {
                   @Parameter(
                       in = ParameterIn.QUERY,
                       name = Constants.SORT_DIRECTION,
-                      description = "",
-                      required = false),
+                      description = "ASC for ascending or DESC for descending order."),
                   @Parameter(
                       in = ParameterIn.QUERY,
                       name = Constants.SORT_BY,
-                      description = "",
-                      required = false)
+                      description = "Field to sort by. Accepted values: 'name' or 'technologies'.")
                 },
                 responses = {
                   @ApiResponse(
@@ -117,10 +115,11 @@ public class ProfileRouterRestV1 {
                               schema =
                                   @Schema(
                                       implementation =
-                                          SwaggerResponses.DefaultProfileTechnologyResponse.class))),
+                                          SwaggerResponses.DefaultProfileTechnologyResponse
+                                              .class))),
                   @ApiResponse(
                       responseCode = "500",
-                      description = "An unexpected error occurred on the server.",
+                      description = Constants.SERVER_ERROR_MSG,
                       content =
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,

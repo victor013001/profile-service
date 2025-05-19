@@ -8,5 +8,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProfileRepository extends ReactiveCrudRepository<ProfileEntity, Long> {
   Mono<Boolean> existsByName(String name);
+
   Flux<ProfileEntity> findAllBy(Pageable pageable);
 }

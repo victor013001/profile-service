@@ -13,7 +13,7 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
 
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Constants;
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;

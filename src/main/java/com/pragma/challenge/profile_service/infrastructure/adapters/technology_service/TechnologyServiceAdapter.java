@@ -2,12 +2,11 @@ package com.pragma.challenge.profile_service.infrastructure.adapters.technology_
 
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayBadRequest;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayError;
-import com.pragma.challenge.profile_service.domain.model.Technology;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.infrastructure.adapters.technology_service.dto.TechnologyNoDescription;
+import com.pragma.challenge.profile_service.domain.model.TechnologyNoDescription;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileDto;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Constants;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.reactor.retry.RetryOperator;
@@ -23,7 +22,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 

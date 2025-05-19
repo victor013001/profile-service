@@ -6,9 +6,9 @@ import com.pragma.challenge.profile_service.domain.model.Profile;
 import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
 import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.infrastructure.adapters.technology_service.mapper.ProfileTechnologyMapper;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileDto;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileRelationDto;
+import com.pragma.challenge.profile_service.domain.mapper.ProfileTechnologyMapper;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileRelation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -74,7 +74,7 @@ public class ProfileUserCase implements ProfileServicePort {
     return technologyServiceGateway.createRelation(
         new TechnologyProfileDto(
             technologiesIds.stream()
-                .map(technologyId -> new TechnologyProfileRelationDto(technologyId, profileId))
+                .map(technologyId -> new TechnologyProfileRelation(technologyId, profileId))
                 .toList()));
   }
 }
