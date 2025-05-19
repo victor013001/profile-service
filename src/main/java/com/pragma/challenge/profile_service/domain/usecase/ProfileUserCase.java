@@ -29,7 +29,7 @@ public class ProfileUserCase implements ProfileServicePort {
   public Mono<Profile> registerProfile(Profile profile) {
     return profilePersistencePort
         .validName(profile.name())
-        .then(registerWithTechnologies(profile))
+        .then(Mono.defer(() -> registerWithTechnologies(profile)))
         .as(transactionalOperator::transactional);
   }
 
@@ -45,8 +45,10 @@ public class ProfileUserCase implements ProfileServicePort {
     List<Long> technologiesIds = profile.technologiesId();
     return profilePersistencePort
         .save(profile)
-        .flatMap(savedProfile -> createTechnologyRelation(savedProfile.id(), technologiesIds))
-        .thenReturn(profile);
+        .flatMap(
+            savedProfile ->
+                createTechnologyRelation(savedProfile.id(), technologiesIds)
+                    .thenReturn(savedProfile));
   }
 
   private Mono<Void> createTechnologyRelation(Long profileId, List<Long> technologiesIds) {

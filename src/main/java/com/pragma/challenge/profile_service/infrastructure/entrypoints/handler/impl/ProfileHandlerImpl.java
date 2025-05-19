@@ -43,9 +43,10 @@ public class ProfileHandlerImpl implements ProfileHandler {
                   .doOnSuccess(
                       profile -> {
                         log.info(
-                            "{} {} with name: {} and description: {}.",
+                            "{} {} with id: {} name: {} and description: {}.",
                             LOG_PREFIX,
                             ServerResponses.PROFILE_CREATED.getMessage(),
+                            profile.id(),
                             profile.name(),
                             profile.description());
                       });
