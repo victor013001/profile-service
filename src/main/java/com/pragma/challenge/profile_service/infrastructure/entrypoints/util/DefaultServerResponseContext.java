@@ -1,4 +1,4 @@
-package com.pragma.challenge.profile_service.infrastructure.util;
+package com.pragma.challenge.profile_service.infrastructure.entrypoints.util;
 
 import java.util.List;
 import org.springframework.http.codec.HttpMessageWriter;
