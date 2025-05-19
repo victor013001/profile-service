@@ -1,6 +1,7 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.persistence.mapper;
 
 import com.pragma.challenge.profile_service.domain.model.Profile;
+import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.entity.ProfileEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,4 +13,6 @@ public interface ProfileEntityMapper {
   Profile toModel(ProfileEntity entity);
 
   ProfileEntity toEntity(Profile profile);
+
+  ProfileTechnology toProfileTechnology(ProfileEntity profile);
 }

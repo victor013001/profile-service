@@ -13,6 +13,7 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
 
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Constants;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -123,7 +125,33 @@ public class ProfileRouterRestIT {
             exchangeResult -> {
               var error = exchangeResult.getResponseBody();
               assertNotNull(error);
-              assertEquals(ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(), error.getDescription());
+              assertEquals(
+                  ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(), error.getDescription());
+            });
+  }
+
+  @Test
+  void getProfiles() {
+    WireMock.stubFor(
+        WireMock.get(WireMock.urlPathEqualTo(TECHNOLOGY_SERVICE_PATH))
+            .withQueryParam(Constants.PROFILE_ID_PARAM, WireMock.matching(".*"))
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("findTechnologiesByProfileId.json")));
+
+    webTestClient
+        .get()
+        .uri(BASE_PATH)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DefaultServerResponse.class)
+        .consumeWith(
+            exchangeResult -> {
+              var error = exchangeResult.getResponseBody();
+              assertNotNull(error);
+              System.out.println(error);
             });
   }
 }

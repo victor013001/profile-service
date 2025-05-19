@@ -2,9 +2,12 @@ package com.pragma.challenge.profile_service.infrastructure.adapters.technology_
 
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayBadRequest;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayError;
+import com.pragma.challenge.profile_service.domain.model.Technology;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
+import com.pragma.challenge.profile_service.infrastructure.adapters.technology_service.dto.TechnologyNoDescription;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Constants;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.reactor.retry.RetryOperator;
@@ -30,6 +33,8 @@ import java.util.concurrent.TimeoutException;
 public class TechnologyServiceAdapter implements TechnologyServiceGateway {
   private static final String LOG_PREFIX = "[TECHNOLOGY_SERVICE_GATEWAY] >>>";
 
+  private final String BASE_PATH = "api/v1/technology";
+
   private final WebClient webClient;
   private final Retry retry;
   private final Bulkhead bulkhead;
@@ -43,11 +48,10 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .get()
         .uri(
             uriBuilder -> {
-              UriBuilder builder = uriBuilder.path("api/v1/technology/exists");
-              technologiesId.forEach(id -> builder.queryParam("id", id));
+              UriBuilder builder = uriBuilder.path(BASE_PATH + "/exists");
+              technologiesId.forEach(id -> builder.queryParam(Constants.ID_PARAM, id));
               return builder.build();
             })
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
         .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
@@ -75,7 +79,7 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
     log.info("{} Starting technologies and profile relation process.", LOG_PREFIX);
     return webClient
         .post()
-        .uri(uriBuilder -> uriBuilder.path("api/v1/technology/profile").build())
+        .uri(uriBuilder -> uriBuilder.path(BASE_PATH + "/profile").build())
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .bodyValue(technologyProfileDto)
         .retrieve()
@@ -84,16 +88,51 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .bodyToMono(new ParameterizedTypeReference<DefaultServerResponse<String>>() {})
         .map(DefaultServerResponse::data)
         .doOnNext(response -> log.info("{} Received API response: {}", LOG_PREFIX, response))
-        .transformDeferred(
-            mono -> mono.retryWhen(reactor.util.retry.Retry.fixedDelay(3, Duration.ofSeconds(2))))
+        .transformDeferred(RetryOperator.of(retry))
         .transformDeferred(mono -> Mono.defer(() -> bulkhead.executeSupplier(() -> mono)))
         .doOnTerminate(
             () ->
                 log.info(
                     "{} Completed technologies and profile relation process in Technology Service.",
                     LOG_PREFIX))
-        .doOnError(error -> log.error("{} Error details: {}", LOG_PREFIX, error.getMessage()))
+        .doOnError(
+            error ->
+                log.error(
+                    "{} Error creating the relation for: {}", LOG_PREFIX, technologyProfileDto))
         .then();
+  }
+
+  @Override
+  @CircuitBreaker(name = "technologyService", fallbackMethod = "fallback")
+  public Mono<List<TechnologyNoDescription>> getTechnologies(Long profileId) {
+    log.info("{} Starting find technologies for profile id: {} process.", LOG_PREFIX, profileId);
+    return webClient
+        .get()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(BASE_PATH)
+                    .queryParam(Constants.PROFILE_ID_PARAM, profileId)
+                    .build())
+        .retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
+        .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
+        .bodyToMono(
+            new ParameterizedTypeReference<
+                DefaultServerResponse<List<TechnologyNoDescription>>>() {})
+        .map(DefaultServerResponse::data)
+        .transformDeferred(RetryOperator.of(retry))
+        .transformDeferred(mono -> Mono.defer(() -> bulkhead.executeSupplier(() -> mono)))
+        .doOnTerminate(
+            () ->
+                log.info(
+                    "{} Completed find technologies for profile id: {} process in Technology Service.",
+                    LOG_PREFIX,
+                    profileId))
+        .doOnError(
+            error ->
+                log.error(
+                    "{} Error finding the technologies for profile id: {}", LOG_PREFIX, profileId));
   }
 
   public Mono<Boolean> fallback(Throwable t) {

@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProfileHandler {
   Mono<ServerResponse> createProfile(ServerRequest request);
+
+  Mono<ServerResponse> getProfiles(ServerRequest request);
 }

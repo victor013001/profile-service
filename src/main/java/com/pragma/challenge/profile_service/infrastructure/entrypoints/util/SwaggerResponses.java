@@ -1,5 +1,6 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints.util;
 
+import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +16,12 @@ public final class SwaggerResponses {
   @AllArgsConstructor
   public static class DefaultMessageResponse {
     private String data;
+  }
+
+  @Data
+  @Schema(name = "DefaultProfileTechnologyResponse")
+  @AllArgsConstructor
+  public static class DefaultProfileTechnologyResponse {
+    private ProfileTechnology data;
   }
 }
