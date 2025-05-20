@@ -8,4 +8,8 @@ public interface ProfileHandler {
   Mono<ServerResponse> createProfile(ServerRequest request);
 
   Mono<ServerResponse> getProfiles(ServerRequest request);
+
+  Mono<ServerResponse> profileExists(ServerRequest request);
+
+  Mono<ServerResponse> createRelation(ServerRequest request);
 }
