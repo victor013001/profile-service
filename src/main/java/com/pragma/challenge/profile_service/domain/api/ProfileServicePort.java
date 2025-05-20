@@ -19,4 +19,6 @@ public interface ProfileServicePort {
   Mono<Boolean> checkProfileIds(ProfileIds profileIds);
 
   Mono<List<ProfileTechnology>> getBootcampProfiles(long bootcampId);
+
+  Mono<Void> delete(Long bootcampId);
 }

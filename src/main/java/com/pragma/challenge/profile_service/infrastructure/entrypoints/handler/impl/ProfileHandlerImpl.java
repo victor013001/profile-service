@@ -149,4 +149,20 @@ public class ProfileHandlerImpl implements ProfileHandler {
                 ServerResponse.status(HttpStatus.OK)
                     .bodyValue(defaultServerResponseMapper.toResponse(profiles)));
   }
+
+  @Override
+  public Mono<ServerResponse> deleteProfile(ServerRequest request) {
+    String id = request.pathVariable(Constants.ID_PATH_VARIABLE);
+    return Mono.just(requestValidator.toLong(id))
+        .flatMap(
+            bootcampId -> {
+              log.info("{} Deleting profiles for bootcamp with id: {}.", LOG_PREFIX, bootcampId);
+              return profileServicePort.delete(bootcampId);
+            })
+        .then(
+            ServerResponse.status(ServerResponses.PROFILES_DELETED.getHttpStatus())
+                .bodyValue(
+                    defaultServerResponseMapper.toResponse(
+                        ServerResponses.PROFILES_DELETED.getMessage())));
+  }
 }

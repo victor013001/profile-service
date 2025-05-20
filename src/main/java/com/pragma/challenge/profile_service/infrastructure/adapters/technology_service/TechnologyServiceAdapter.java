@@ -1,16 +1,18 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.technology_service;
 
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayBadRequest;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayError;
-import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
 import com.pragma.challenge.profile_service.domain.model.TechnologyNoDescription;
-import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
-import com.pragma.challenge.profile_service.domain.constants.Constants;
+import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.reactor.retry.RetryOperator;
 import io.github.resilience4j.retry.Retry;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,9 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -131,6 +130,40 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
             error ->
                 log.error(
                     "{} Error finding the technologies for profile id: {}", LOG_PREFIX, profileId));
+  }
+
+  @Override
+  public Mono<Void> deleteProfileTechnologies(List<Long> profileIds) {
+    log.info("{} Starting delete technologies for profile id: {}.", LOG_PREFIX, profileIds);
+    return webClient
+        .delete()
+        .uri(
+            uriBuilder -> {
+              UriBuilder builder = uriBuilder.path(BASE_PATH);
+              profileIds.forEach(id -> builder.queryParam(Constants.PROFILE_ID_PARAM, id));
+              return builder.build();
+            })
+        .retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
+        .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
+        .bodyToMono(new ParameterizedTypeReference<DefaultServerResponse<String>>() {})
+        .map(DefaultServerResponse::data)
+        .doOnNext(
+            exists -> log.info("{} Received Technology Service response: {}", LOG_PREFIX, exists))
+        .transformDeferred(RetryOperator.of(retry))
+        .transformDeferred(mono -> Mono.defer(() -> bulkhead.executeSupplier(() -> mono)))
+        .doOnTerminate(
+            () ->
+                log.info(
+                    "{} Completed delete technologies for profile process in Technology Service.",
+                    LOG_PREFIX))
+        .doOnError(
+            ignore ->
+                log.error(
+                    "{} Error deleting the technologies for profile id: {}.",
+                    LOG_PREFIX,
+                    profileIds))
+        .then();
   }
 
   public Mono<Boolean> fallback(Throwable t) {

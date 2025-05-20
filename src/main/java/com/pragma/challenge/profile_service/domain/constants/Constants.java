@@ -1,8 +1,7 @@
 package com.pragma.challenge.profile_service.domain.constants;
 
-import lombok.experimental.UtilityClass;
-
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
@@ -27,4 +26,6 @@ public class Constants {
   public static final String GATEWAY_BAD_REQUEST_MSG = "An unexpected error occurred while processing the request through the gateway.";
   public static final String TECHNOLOGIES_NOT_FOUND_MSG = "Technologies provided not found.";
   public static final String BOOTCAMP_PROFILE_CREATED_MSG = "Relations created successfully.";
+  public static final String PROFILES_DELETED_MSG = "The profiles of the bootcamp were deleted successfully.";
+  public static final String ID_PATH_VARIABLE = "id";
 }
