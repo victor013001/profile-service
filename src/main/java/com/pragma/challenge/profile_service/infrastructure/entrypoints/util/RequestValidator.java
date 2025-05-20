@@ -56,4 +56,12 @@ public class RequestValidator {
       throw new BadRequest();
     }
   }
+
+  public long toLong(String value) {
+    try {
+      return Long.parseLong(value);
+    } catch (NumberFormatException e) {
+      throw new BadRequest();
+    }
+  }
 }

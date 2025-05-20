@@ -7,14 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.entity.ProfileEntity;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.ProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
-
-import com.pragma.challenge.profile_service.domain.constants.Constants;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,9 +159,8 @@ public class ProfileRouterRestIT {
         .expectBody(DefaultServerResponse.class)
         .consumeWith(
             exchangeResult -> {
-              var error = exchangeResult.getResponseBody();
-              assertNotNull(error);
-              System.out.println(error);
+              var response = exchangeResult.getResponseBody();
+              assertNotNull(response);
             });
   }
 

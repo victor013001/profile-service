@@ -17,4 +17,6 @@ public interface ProfilePersistencePort {
   Mono<BootcampProfile> saveTechnologyProfile(BootcampProfile bootcampProfile);
 
   Mono<Boolean> existsById(Long id);
+
+  Flux<ProfileTechnology> findAllByBootcampId(long bootcampId);
 }
