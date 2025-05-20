@@ -26,4 +26,5 @@ public class Constants {
   public static final String GATEWAY_ERROR_MSG = "Failed to process the request due to an internal gateway error.";
   public static final String GATEWAY_BAD_REQUEST_MSG = "An unexpected error occurred while processing the request through the gateway.";
   public static final String TECHNOLOGIES_NOT_FOUND_MSG = "Technologies provided not found.";
+  public static final String BOOTCAMP_PROFILE_CREATED_MSG = "Relations created successfully.";
 }

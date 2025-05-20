@@ -1,5 +1,6 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints;
 
+import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.BootcampProfiles;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
 import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
@@ -8,6 +9,7 @@ import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.Swag
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -124,12 +126,99 @@ public class ProfileRouterRestV1 {
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
                               schema = @Schema(implementation = StandardError.class)))
+                })),
+    @RouterOperation(
+        path = "/api/v1/profile/exists",
+        method = RequestMethod.GET,
+        beanClass = ProfileHandler.class,
+        beanMethod = "profileExists",
+        operation =
+            @Operation(
+                operationId = "profilesExists",
+                summary = "Check if profiles exist",
+                parameters = {
+                  @Parameter(
+                      in = ParameterIn.QUERY,
+                      name = "id",
+                      description = "Profile IDs to check existence",
+                      required = true,
+                      array = @ArraySchema(schema = @Schema(type = "string", example = "1")))
+                },
+                responses = {
+                  @ApiResponse(
+                      responseCode = "200",
+                      description = "Existence check completed.",
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema =
+                                  @Schema(
+                                      implementation =
+                                          SwaggerResponses.DefaultBooleanResponse.class))),
+                  @ApiResponse(
+                      responseCode = "400",
+                      description = Constants.BAD_REQUEST_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class))),
+                  @ApiResponse(
+                      responseCode = "500",
+                      description = Constants.SERVER_ERROR_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class)))
+                })),
+    @RouterOperation(
+        path = "/api/v1/profile/bootcamp",
+        method = RequestMethod.POST,
+        beanClass = ProfileHandler.class,
+        beanMethod = "createRelation",
+        operation =
+            @Operation(
+                operationId = "createRelation",
+                summary = "Create profile and technology relation.",
+                requestBody =
+                    @RequestBody(
+                        required = true,
+                        content =
+                            @Content(
+                                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                schema = @Schema(implementation = BootcampProfiles.class))),
+                responses = {
+                  @ApiResponse(
+                      responseCode = "201",
+                      description = Constants.BOOTCAMP_PROFILE_CREATED_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema =
+                                  @Schema(
+                                      implementation =
+                                          SwaggerResponses.DefaultMessageResponse.class))),
+                  @ApiResponse(
+                      responseCode = "400",
+                      description = Constants.BAD_REQUEST_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class))),
+                  @ApiResponse(
+                      responseCode = "500",
+                      description = Constants.SERVER_ERROR_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class)))
                 }))
   })
   public RouterFunction<ServerResponse> routerFunction(ProfileHandler profileHandler) {
     return nest(
         path("/api/v1/profile"),
         route(RequestPredicates.POST(""), profileHandler::createProfile)
-            .andRoute(RequestPredicates.GET(""), profileHandler::getProfiles));
+            .andRoute(RequestPredicates.GET(""), profileHandler::getProfiles)
+            .andRoute(RequestPredicates.GET("/exists"), profileHandler::profileExists)
+            .andRoute(RequestPredicates.POST("/bootcamp"), profileHandler::createRelation));
   }
 }

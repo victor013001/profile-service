@@ -24,4 +24,11 @@ public final class SwaggerResponses {
   public static class DefaultProfileTechnologyResponse {
     private ProfileTechnology data;
   }
+
+  @Data
+  @Schema(name = "DefaultBooleanResponse")
+  @AllArgsConstructor
+  public static class DefaultBooleanResponse {
+    private Boolean data;
+  }
 }

@@ -1,9 +1,12 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.persistence;
 
+import com.pragma.challenge.profile_service.domain.model.BootcampProfile;
 import com.pragma.challenge.profile_service.domain.model.Profile;
 import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
 import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
+import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.mapper.BootcampProfileEntityMapper;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.mapper.ProfileEntityMapper;
+import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.BootcampProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.ProfileRepository;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.ProfileAlreadyExists;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,8 @@ public class ProfilePersistenceAdapter implements ProfilePersistencePort {
 
   private final ProfileRepository profileRepository;
   private final ProfileEntityMapper profileEntityMapper;
+  private final BootcampProfileRepository bootcampProfileRepository;
+  private final BootcampProfileEntityMapper bootcampProfileEntityMapper;
 
   @Override
   public Mono<Profile> save(Profile profile) {
@@ -51,5 +56,23 @@ public class ProfilePersistenceAdapter implements ProfilePersistencePort {
   @Override
   public Flux<ProfileTechnology> findAllBy(PageRequest pageRequest) {
     return profileRepository.findAllBy(pageRequest).map(profileEntityMapper::toProfileTechnology);
+  }
+
+  @Override
+  public Mono<BootcampProfile> saveTechnologyProfile(BootcampProfile bootcampProfile) {
+    log.info(
+        "{} Saving relation with bootcamp id: {} and profile id: {}.",
+        LOG_PREFIX,
+        bootcampProfile.bootcampId(),
+        bootcampProfile.profileId());
+    return bootcampProfileRepository
+        .save(bootcampProfileEntityMapper.toEntity(bootcampProfile))
+        .map(bootcampProfileEntityMapper::toModel);
+  }
+
+  @Override
+  public Mono<Boolean> existsById(Long id) {
+    log.info("{} Checking if profile with id: {} exists.", LOG_PREFIX, id);
+    return profileRepository.existsById(id);
   }
 }

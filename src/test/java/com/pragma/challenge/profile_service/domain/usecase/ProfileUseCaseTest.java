@@ -25,8 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ProfileUserCaseTest {
-  @InjectMocks ProfileUserCase profileUserCase;
+class ProfileUseCaseTest {
+  @InjectMocks
+  ProfileUseCase profileUseCase;
 
   @Mock ProfilePersistencePort profilePersistencePort;
   @Mock TechnologyServiceGateway technologyServiceGateway;
@@ -53,7 +54,7 @@ class ProfileUserCaseTest {
     when(technologyServiceGateway.createRelation(any(TechnologyProfileDto.class)))
         .thenReturn(Mono.empty());
 
-    StepVerifier.create(profileUserCase.registerProfile(profile))
+    StepVerifier.create(profileUseCase.registerProfile(profile))
         .assertNext(
             savedProfile -> {
               assert Objects.nonNull(savedProfile.id());
@@ -69,7 +70,7 @@ class ProfileUserCaseTest {
     when(profilePersistencePort.validName(profile.name()))
         .thenReturn(Mono.error(ProfileAlreadyExists::new));
 
-    StepVerifier.create(profileUserCase.registerProfile(profile))
+    StepVerifier.create(profileUseCase.registerProfile(profile))
         .expectError(ProfileAlreadyExists.class)
         .verify();
 
@@ -85,7 +86,7 @@ class ProfileUserCaseTest {
     when(profilePersistencePort.validName(profile.name())).thenReturn(Mono.empty());
     when(technologyServiceGateway.technologiesExists(anyList())).thenReturn(Mono.just(false));
 
-    StepVerifier.create(profileUserCase.registerProfile(profile))
+    StepVerifier.create(profileUseCase.registerProfile(profile))
         .expectError(TechnologiesNotFound.class)
         .verify();
 

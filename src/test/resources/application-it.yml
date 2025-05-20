@@ -35,7 +35,7 @@ management:
       enabled: false
 
 technology-service:
-  base-url: http://localhost:8084/
+  base-url: http://localhost:${wiremock.server.port}
   timeout: 1000
 
 resilience4j.circuitbreaker:

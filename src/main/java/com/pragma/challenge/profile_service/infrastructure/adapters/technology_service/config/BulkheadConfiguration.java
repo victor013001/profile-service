@@ -15,7 +15,7 @@ public class BulkheadConfiguration {
   }
 
   @Bean
-  public Bulkhead emailValidatorBulkhead() {
+  public Bulkhead technologyServiceBulkhead() {
     return bulkheadRegistry.bulkhead("technologyServiceBulkhead");
   }
 }

@@ -4,6 +4,7 @@ import static com.pragma.challenge.profile_service.util.ProfileDtoData.getInvali
 import static com.pragma.challenge.profile_service.util.ProfileDtoData.getProfileDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
@@ -22,13 +23,14 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ActiveProfiles("it")
 @AutoConfigureWebTestClient
-@AutoConfigureWireMock(port = 8084)
+@AutoConfigureWireMock(port = 0)
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProfileRouterRestIT {
@@ -47,6 +49,16 @@ public class ProfileRouterRestIT {
                 ProfileEntity.builder()
                     .name("QA")
                     .description("Ensures software products meet quality standards before release")
+                    .build(),
+                ProfileEntity.builder()
+                    .name("DevOps")
+                    .description(
+                        "Bridges the gap between development and operations to streamline software delivery")
+                    .build(),
+                ProfileEntity.builder()
+                    .name("Data Scientist")
+                    .description(
+                        "Analyzes complex data to support decision-making and build predictive models")
                     .build()))
         .blockLast();
   }
@@ -151,6 +163,23 @@ public class ProfileRouterRestIT {
               var error = exchangeResult.getResponseBody();
               assertNotNull(error);
               System.out.println(error);
+            });
+  }
+
+  @Test
+  void profilesExists() {
+    webTestClient
+        .get()
+        .uri(BASE_PATH + "/exists?id=1&id=2&id=3")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(new ParameterizedTypeReference<DefaultServerResponse<Boolean>>() {})
+        .consumeWith(
+            exchangeResult -> {
+              var response = exchangeResult.getResponseBody();
+              assertNotNull(response);
+              assertTrue(response.data());
             });
   }
 }
