@@ -12,4 +12,6 @@ public interface ProfileHandler {
   Mono<ServerResponse> profileExists(ServerRequest request);
 
   Mono<ServerResponse> createRelation(ServerRequest request);
+
+  Mono<ServerResponse> getProfilesByBootcampId(ServerRequest request);
 }

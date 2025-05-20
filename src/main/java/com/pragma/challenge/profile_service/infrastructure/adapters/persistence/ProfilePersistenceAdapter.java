@@ -1,5 +1,6 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.persistence;
 
+import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.ProfileAlreadyExists;
 import com.pragma.challenge.profile_service.domain.model.BootcampProfile;
 import com.pragma.challenge.profile_service.domain.model.Profile;
 import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
@@ -8,7 +9,6 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.mapper.ProfileEntityMapper;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.BootcampProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.ProfileRepository;
-import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.ProfileAlreadyExists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -74,5 +74,13 @@ public class ProfilePersistenceAdapter implements ProfilePersistencePort {
   public Mono<Boolean> existsById(Long id) {
     log.info("{} Checking if profile with id: {} exists.", LOG_PREFIX, id);
     return profileRepository.existsById(id);
+  }
+
+  @Override
+  public Flux<ProfileTechnology> findAllByBootcampId(long bootcampId) {
+    log.info("{} Finding profiles for bootcamp with id: {}", LOG_PREFIX, bootcampId);
+    return profileRepository
+        .findAllByBootcampId(bootcampId)
+        .map(profileEntityMapper::toProfileTechnology);
   }
 }

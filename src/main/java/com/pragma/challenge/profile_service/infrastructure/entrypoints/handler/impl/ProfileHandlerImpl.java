@@ -1,6 +1,8 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.impl;
 
 import com.pragma.challenge.profile_service.domain.api.ProfileServicePort;
+import com.pragma.challenge.profile_service.domain.constants.Constants;
+import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.BootcampProfiles;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileIdsRequest;
@@ -9,9 +11,7 @@ import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.Bo
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.DefaultServerResponseMapper;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.ProfileIdsMapper;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.mapper.ProfileMapper;
-import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.RequestValidator;
-import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -126,8 +126,7 @@ public class ProfileHandlerImpl implements ProfileHandler {
               log.info("{} Creating bootcamp profile relations", LOG_PREFIX);
               return profileServicePort
                   .registerBootcampProfileRelation(
-                      bootcampProfileMapper.toBootcampProfile(
-                          bootcampProfileDto.relations()))
+                      bootcampProfileMapper.toBootcampProfile(bootcampProfileDto.relations()))
                   .doOnSuccess(
                       technology -> log.info("{} Relations created successfully.", LOG_PREFIX));
             })
@@ -136,5 +135,18 @@ public class ProfileHandlerImpl implements ProfileHandler {
                 .bodyValue(
                     defaultServerResponseMapper.toResponse(
                         ServerResponses.BOOTCAMP_PROFILE_CREATED.getMessage())));
+  }
+
+  @Override
+  public Mono<ServerResponse> getProfilesByBootcampId(ServerRequest request) {
+    long bootcampId =
+        requestValidator.toLong(request.queryParam(Constants.PROFILE_ID_PARAM).orElseThrow());
+    log.info("{} Getting profiles for bootcamp with id: {}", LOG_PREFIX, bootcampId);
+    return profileServicePort
+        .getBootcampProfiles(bootcampId)
+        .flatMap(
+            profiles ->
+                ServerResponse.status(HttpStatus.OK)
+                    .bodyValue(defaultServerResponseMapper.toResponse(profiles)));
   }
 }

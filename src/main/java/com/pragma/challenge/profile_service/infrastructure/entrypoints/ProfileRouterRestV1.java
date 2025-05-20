@@ -1,10 +1,14 @@
 package com.pragma.challenge.profile_service.infrastructure.entrypoints;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import static org.springframework.web.reactive.function.server.RouterFunctions.nest;
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+
+import com.pragma.challenge.profile_service.domain.constants.Constants;
+import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.BootcampProfiles;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.ProfileDto;
-import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.handler.ProfileHandler;
-import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.util.SwaggerResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,10 +27,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-
-import static org.springframework.web.reactive.function.server.RequestPredicates.path;
-import static org.springframework.web.reactive.function.server.RouterFunctions.nest;
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
 public class ProfileRouterRestV1 {
@@ -219,6 +219,7 @@ public class ProfileRouterRestV1 {
         route(RequestPredicates.POST(""), profileHandler::createProfile)
             .andRoute(RequestPredicates.GET(""), profileHandler::getProfiles)
             .andRoute(RequestPredicates.GET("/exists"), profileHandler::profileExists)
-            .andRoute(RequestPredicates.POST("/bootcamp"), profileHandler::createRelation));
+            .andRoute(RequestPredicates.POST("/bootcamp"), profileHandler::createRelation)
+            .andRoute(RequestPredicates.GET(""), profileHandler::getProfilesByBootcampId));
   }
 }

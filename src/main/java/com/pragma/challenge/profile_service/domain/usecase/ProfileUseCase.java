@@ -2,15 +2,16 @@ package com.pragma.challenge.profile_service.domain.usecase;
 
 import com.pragma.challenge.profile_service.domain.api.ProfileServicePort;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.TechnologiesNotFound;
+import com.pragma.challenge.profile_service.domain.mapper.ProfileTechnologyMapper;
 import com.pragma.challenge.profile_service.domain.model.BootcampProfile;
 import com.pragma.challenge.profile_service.domain.model.Profile;
 import com.pragma.challenge.profile_service.domain.model.ProfileIds;
 import com.pragma.challenge.profile_service.domain.model.ProfileTechnology;
-import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
-import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.domain.mapper.ProfileTechnologyMapper;
 import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
 import com.pragma.challenge.profile_service.domain.model.TechnologyProfileRelation;
+import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
+import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -78,6 +77,21 @@ public class ProfileUseCase implements ProfileServicePort {
                         }))
         .any(result -> !result)
         .flatMap(foundFalse -> Mono.just(!foundFalse));
+  }
+
+  @Override
+  public Mono<List<ProfileTechnology>> getBootcampProfiles(long bootcampId) {
+    return profilePersistencePort
+        .findAllByBootcampId(bootcampId)
+        .flatMap(
+            profileTechnology ->
+                technologyServiceGateway
+                    .getTechnologies(profileTechnology.id())
+                    .map(
+                        technologies ->
+                            profileTechnologyMapper.toProfileTechnologyWithTechnologies(
+                                profileTechnology, technologies)))
+        .collectList();
   }
 
   private Mono<Profile> registerWithTechnologies(Profile profile) {
