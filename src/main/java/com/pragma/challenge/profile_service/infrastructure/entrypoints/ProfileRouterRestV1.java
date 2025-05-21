@@ -211,6 +211,83 @@ public class ProfileRouterRestV1 {
                           @Content(
                               mediaType = MediaType.APPLICATION_JSON_VALUE,
                               schema = @Schema(implementation = StandardError.class)))
+                })),
+    @RouterOperation(
+        path = "/api/v1/profile/{id}",
+        method = RequestMethod.DELETE,
+        beanClass = ProfileHandler.class,
+        beanMethod = "deleteProfileForBootcamp",
+        operation =
+            @Operation(
+                operationId = "deleteProfileForBootcamp",
+                summary = "Delete a profile by bootcamp id",
+                parameters = {
+                  @Parameter(
+                      in = ParameterIn.PATH,
+                      name = "id",
+                      required = true,
+                      description = "Id of the bootcamp to delete the profiles")
+                },
+                responses = {
+                  @ApiResponse(
+                      responseCode = "200",
+                      description = Constants.PROFILES_DELETED_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema =
+                                  @Schema(
+                                      implementation =
+                                          SwaggerResponses.DefaultMessageResponse.class))),
+                  @ApiResponse(
+                      responseCode = "400",
+                      description = Constants.BAD_REQUEST_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class))),
+                  @ApiResponse(
+                      responseCode = "500",
+                      description = Constants.SERVER_ERROR_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class)))
+                })),
+    @RouterOperation(
+        path = "/api/v1/technology",
+        method = RequestMethod.DELETE,
+        beanClass = ProfileHandler.class,
+        beanMethod = "deleteProfile",
+        operation =
+            @Operation(
+                operationId = "deleteProfile",
+                summary = "Delete a profile by ID",
+                parameters = {
+                  @Parameter(
+                      in = ParameterIn.PATH,
+                      name = "id",
+                      required = true,
+                      description = "ID of the profile to delete")
+                },
+                responses = {
+                  @ApiResponse(
+                      responseCode = "200",
+                      description = Constants.PROFILES_DELETED_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema =
+                                  @Schema(
+                                      implementation =
+                                          SwaggerResponses.DefaultMessageResponse.class))),
+                  @ApiResponse(
+                      responseCode = "500",
+                      description = Constants.SERVER_ERROR_MSG,
+                      content =
+                          @Content(
+                              mediaType = MediaType.APPLICATION_JSON_VALUE,
+                              schema = @Schema(implementation = StandardError.class)))
                 }))
   })
   public RouterFunction<ServerResponse> routerFunction(ProfileHandler profileHandler) {
@@ -220,6 +297,7 @@ public class ProfileRouterRestV1 {
             .andRoute(RequestPredicates.GET(""), profileHandler::getProfiles)
             .andRoute(RequestPredicates.GET("/exists"), profileHandler::profileExists)
             .andRoute(RequestPredicates.POST("/bootcamp"), profileHandler::createRelation)
-            .andRoute(RequestPredicates.GET(""), profileHandler::getProfilesByBootcampId));
+            .andRoute(RequestPredicates.GET(""), profileHandler::getProfilesByBootcampId)
+            .andRoute(RequestPredicates.DELETE("/{id}"), profileHandler::deleteProfile));
   }
 }

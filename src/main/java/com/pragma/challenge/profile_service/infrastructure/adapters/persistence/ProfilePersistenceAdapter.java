@@ -9,6 +9,7 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.mapper.ProfileEntityMapper;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.BootcampProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.ProfileRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -82,5 +83,26 @@ public class ProfilePersistenceAdapter implements ProfilePersistencePort {
     return profileRepository
         .findAllByBootcampId(bootcampId)
         .map(profileEntityMapper::toProfileTechnology);
+  }
+
+  @Override
+  public Mono<List<Long>> findProfileIdsByOnlyBootcampId(Long bootcampId) {
+    log.info(
+        "{} Finding profile ids that have a relation with the bootcamp id: {}",
+        LOG_PREFIX,
+        bootcampId);
+    return bootcampProfileRepository.findProfileIdsByOnlyBootcampId(bootcampId).collectList();
+  }
+
+  @Override
+  public Mono<Void> deleteByBootcampId(Long bootcampId) {
+    log.info("{} Deleting relation where bootcamp id: {}", LOG_PREFIX, bootcampId);
+    return bootcampProfileRepository.deleteByBootcampId(bootcampId);
+  }
+
+  @Override
+  public Mono<Void> deleteProfilesByIds(List<Long> profileIds) {
+    log.info("{} Deleting profiles with ids: {}", LOG_PREFIX, profileIds);
+    return profileRepository.deleteProfilesByIds(profileIds);
   }
 }

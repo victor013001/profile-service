@@ -94,6 +94,19 @@ public class ProfileUseCase implements ProfileServicePort {
         .collectList();
   }
 
+  @Override
+  public Mono<Void> delete(Long bootcampId) {
+    return profilePersistencePort
+        .findProfileIdsByOnlyBootcampId(bootcampId)
+        .flatMap(
+            profileIds ->
+                technologyServiceGateway
+                    .deleteProfileTechnologies(profileIds)
+                    .then(profilePersistencePort.deleteByBootcampId(bootcampId))
+                    .then(profilePersistencePort.deleteProfilesByIds(profileIds)))
+        .as(transactionalOperator::transactional);
+  }
+
   private Mono<Profile> registerWithTechnologies(Profile profile) {
     return technologyServiceGateway
         .technologiesExists(profile.technologiesId())

@@ -10,7 +10,9 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.pragma.challenge.profile_service.domain.constants.Constants;
 import com.pragma.challenge.profile_service.domain.enums.ServerResponses;
 import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
+import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.entity.BootcampProfileEntity;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.entity.ProfileEntity;
+import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.BootcampProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository.ProfileRepository;
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
@@ -39,6 +41,7 @@ public class ProfileRouterRestIT {
 
   @Autowired WebTestClient webTestClient;
   @Autowired ProfileRepository profileRepository;
+  @Autowired BootcampProfileRepository bootcampProfileRepository;
 
   @BeforeEach
   void setUp() {
@@ -59,6 +62,14 @@ public class ProfileRouterRestIT {
                     .description(
                         "Analyzes complex data to support decision-making and build predictive models")
                     .build()))
+        .blockLast();
+
+    bootcampProfileRepository
+        .saveAll(
+            List.of(
+                BootcampProfileEntity.builder().profileId(1L).bootcampId(1L).build(),
+                BootcampProfileEntity.builder().profileId(2L).bootcampId(1L).build(),
+                BootcampProfileEntity.builder().profileId(2L).bootcampId(2L).build()))
         .blockLast();
   }
 
@@ -178,6 +189,31 @@ public class ProfileRouterRestIT {
               var response = exchangeResult.getResponseBody();
               assertNotNull(response);
               assertTrue(response.data());
+            });
+  }
+
+  @Test
+  void deleteProfile() {
+    WireMock.stubFor(
+        WireMock.delete(WireMock.urlPathMatching(TECHNOLOGY_SERVICE_PATH))
+            .withQueryParam(Constants.PROFILE_ID_PARAM, WireMock.matching(".*"))
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .withBodyFile("deletedTechnologies.json")));
+
+    webTestClient
+        .delete()
+        .uri(BASE_PATH + "/1")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DefaultServerResponse.class)
+        .consumeWith(
+            exchangeResult -> {
+              var response = exchangeResult.getResponseBody();
+              assertNotNull(response);
+              System.out.println(response);
             });
   }
 }

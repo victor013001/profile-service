@@ -1,6 +1,7 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.persistence.repository;
 
 import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.entity.ProfileEntity;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -15,4 +16,7 @@ public interface ProfileRepository extends ReactiveCrudRepository<ProfileEntity,
   @Query(
       "SELECT p.* FROM profile p JOIN profile_bootcamp pb ON pb.profile_id = p.id WHERE pb.bootcamp_id = :bootcampId")
   Flux<ProfileEntity> findAllByBootcampId(long bootcampId);
+
+  @Query("DELETE FROM profile WHERE id IN (:profileIds)")
+  Mono<Void> deleteProfilesByIds(List<Long> profileIds);
 }
