@@ -11,32 +11,38 @@ import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
 import com.pragma.challenge.profile_service.domain.model.TechnologyProfileRelation;
 import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
 import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
+import com.pragma.challenge.profile_service.domain.validation.ValidListAnnotation;
+import com.pragma.challenge.profile_service.domain.validation.ValidNotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class ProfileUseCase implements ProfileServicePort {
   private static final String LOG_PREFIX = "[PROFILE_USE_CASE] >>>";
 
   private final ProfilePersistencePort profilePersistencePort;
   private final TechnologyServiceGateway technologyServiceGateway;
-  private final TransactionalOperator transactionalOperator;
   private final ProfileTechnologyMapper profileTechnologyMapper;
 
   @Override
   public Mono<Profile> registerProfile(Profile profile) {
-    return profilePersistencePort
-        .validName(profile.name())
-        .then(Mono.defer(() -> registerWithTechnologies(profile)))
-        .as(transactionalOperator::transactional);
+    return Mono.just(profile)
+        .flatMap(
+            profile1 -> {
+              ValidListAnnotation.valid(profile1);
+              ValidNotNull.valid(profile1);
+              return Mono.just(profile1);
+            })
+        .flatMap(
+            profile1 ->
+                profilePersistencePort
+                    .validName(profile1.name())
+                    .then(Mono.defer(() -> registerWithTechnologies(profile1))));
   }
 
   @Override
@@ -57,8 +63,7 @@ public class ProfileUseCase implements ProfileServicePort {
   public Mono<Void> registerBootcampProfileRelation(List<BootcampProfile> bootcampProfile) {
     return Flux.fromIterable(bootcampProfile)
         .flatMap(profilePersistencePort::saveTechnologyProfile)
-        .then()
-        .as(transactionalOperator::transactional);
+        .then();
   }
 
   @Override
@@ -103,8 +108,7 @@ public class ProfileUseCase implements ProfileServicePort {
                 technologyServiceGateway
                     .deleteProfileTechnologies(profileIds)
                     .then(profilePersistencePort.deleteByBootcampId(bootcampId))
-                    .then(profilePersistencePort.deleteProfilesByIds(profileIds)))
-        .as(transactionalOperator::transactional);
+                    .then(profilePersistencePort.deleteProfilesByIds(profileIds)));
   }
 
   private Mono<Profile> registerWithTechnologies(Profile profile) {

@@ -1,3 +1,5 @@
 package com.pragma.challenge.profile_service.domain.model;
 
-public record BootcampProfile(Long bootcampId, Long profileId) {}
+import com.pragma.challenge.profile_service.domain.validation.annotation.NotNull;
+
+public record BootcampProfile(@NotNull Long bootcampId, @NotNull Long profileId) {}
