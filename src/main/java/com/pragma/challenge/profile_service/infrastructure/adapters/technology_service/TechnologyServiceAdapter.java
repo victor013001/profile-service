@@ -1,6 +1,7 @@
 package com.pragma.challenge.profile_service.infrastructure.adapters.technology_service;
 
 import com.pragma.challenge.profile_service.domain.constants.Constants;
+import com.pragma.challenge.profile_service.domain.exceptions.StandardError;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayBadRequest;
 import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.GatewayError;
 import com.pragma.challenge.profile_service.domain.model.TechnologyNoDescription;
@@ -52,7 +53,8 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
         .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
-        .bodyToMono(new ParameterizedTypeReference<DefaultServerResponse<Boolean>>() {})
+        .bodyToMono(
+            new ParameterizedTypeReference<DefaultServerResponse<Boolean, StandardError>>() {})
         .map(DefaultServerResponse::data)
         .doOnNext(exists -> log.info("{} Received API response.", LOG_PREFIX))
         .transformDeferred(RetryOperator.of(retry))
@@ -82,7 +84,8 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
         .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
-        .bodyToMono(new ParameterizedTypeReference<DefaultServerResponse<String>>() {})
+        .bodyToMono(
+            new ParameterizedTypeReference<DefaultServerResponse<String, StandardError>>() {})
         .map(DefaultServerResponse::data)
         .doOnNext(response -> log.info("{} Received API response: {}", LOG_PREFIX, response))
         .transformDeferred(RetryOperator.of(retry))
@@ -116,7 +119,7 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
         .bodyToMono(
             new ParameterizedTypeReference<
-                DefaultServerResponse<List<TechnologyNoDescription>>>() {})
+                DefaultServerResponse<List<TechnologyNoDescription>, StandardError>>() {})
         .map(DefaultServerResponse::data)
         .transformDeferred(RetryOperator.of(retry))
         .transformDeferred(mono -> Mono.defer(() -> bulkhead.executeSupplier(() -> mono)))
@@ -146,7 +149,8 @@ public class TechnologyServiceAdapter implements TechnologyServiceGateway {
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(GatewayBadRequest::new))
         .onStatus(HttpStatusCode::is5xxServerError, response -> Mono.error(GatewayError::new))
-        .bodyToMono(new ParameterizedTypeReference<DefaultServerResponse<String>>() {})
+        .bodyToMono(
+            new ParameterizedTypeReference<DefaultServerResponse<String, StandardError>>() {})
         .map(DefaultServerResponse::data)
         .doOnNext(
             exists -> log.info("{} Received Technology Service response: {}", LOG_PREFIX, exists))

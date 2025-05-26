@@ -17,6 +17,7 @@ import com.pragma.challenge.profile_service.infrastructure.adapters.persistence.
 import com.pragma.challenge.profile_service.infrastructure.entrypoints.dto.DefaultServerResponse;
 import java.util.List;
 import org.apache.http.HttpHeaders;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,32 +46,50 @@ public class ProfileRouterRestIT {
 
   @BeforeEach
   void setUp() {
-    profileRepository
-        .saveAll(
-            List.of(
-                ProfileEntity.builder()
-                    .name("QA")
-                    .description("Ensures software products meet quality standards before release")
-                    .build(),
-                ProfileEntity.builder()
-                    .name("DevOps")
-                    .description(
-                        "Bridges the gap between development and operations to streamline software delivery")
-                    .build(),
-                ProfileEntity.builder()
-                    .name("Data Scientist")
-                    .description(
-                        "Analyzes complex data to support decision-making and build predictive models")
-                    .build()))
-        .blockLast();
+    List<ProfileEntity> savedProfiles =
+        profileRepository
+            .saveAll(
+                List.of(
+                    ProfileEntity.builder()
+                        .name("QA")
+                        .description(
+                            "Ensures software products meet quality standards before release")
+                        .build(),
+                    ProfileEntity.builder()
+                        .name("DevOps")
+                        .description(
+                            "Bridges the gap between development and operations to streamline software delivery")
+                        .build(),
+                    ProfileEntity.builder()
+                        .name("Data Scientist")
+                        .description(
+                            "Analyzes complex data to support decision-making and build predictive models")
+                        .build()))
+            .collectList()
+            .block();
 
     bootcampProfileRepository
         .saveAll(
             List.of(
-                BootcampProfileEntity.builder().profileId(1L).bootcampId(1L).build(),
-                BootcampProfileEntity.builder().profileId(2L).bootcampId(1L).build(),
-                BootcampProfileEntity.builder().profileId(2L).bootcampId(2L).build()))
+                BootcampProfileEntity.builder()
+                    .profileId(savedProfiles.get(0).getId())
+                    .bootcampId(1L)
+                    .build(),
+                BootcampProfileEntity.builder()
+                    .profileId(savedProfiles.get(1).getId())
+                    .bootcampId(1L)
+                    .build(),
+                BootcampProfileEntity.builder()
+                    .profileId(savedProfiles.get(1).getId())
+                    .bootcampId(2L)
+                    .build()))
         .blockLast();
+  }
+
+  @AfterEach
+  void tearDown() {
+    bootcampProfileRepository.deleteAll().block();
+    profileRepository.deleteAll().block();
   }
 
   @Test
@@ -115,12 +134,14 @@ public class ProfileRouterRestIT {
         .exchange()
         .expectStatus()
         .isBadRequest()
-        .expectBody(StandardError.class)
+        .expectBody(
+            new ParameterizedTypeReference<DefaultServerResponse<Object, StandardError>>() {})
         .consumeWith(
             exchangeResult -> {
-              var error = exchangeResult.getResponseBody();
-              assertNotNull(error);
-              assertEquals(ServerResponses.BAD_REQUEST.getMessage(), error.getDescription());
+              var response = exchangeResult.getResponseBody();
+              assertNotNull(response);
+              assertEquals(
+                  ServerResponses.BAD_REQUEST.getMessage(), response.error().getDescription());
             });
   }
 
@@ -141,13 +162,15 @@ public class ProfileRouterRestIT {
         .exchange()
         .expectStatus()
         .isNotFound()
-        .expectBody(StandardError.class)
+        .expectBody(
+            new ParameterizedTypeReference<DefaultServerResponse<Object, StandardError>>() {})
         .consumeWith(
             exchangeResult -> {
-              var error = exchangeResult.getResponseBody();
-              assertNotNull(error);
+              var response = exchangeResult.getResponseBody();
+              assertNotNull(response);
               assertEquals(
-                  ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(), error.getDescription());
+                  ServerResponses.TECHNOLOGIES_NOT_FOUND.getMessage(),
+                  response.error().getDescription());
             });
   }
 
@@ -183,7 +206,8 @@ public class ProfileRouterRestIT {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(new ParameterizedTypeReference<DefaultServerResponse<Boolean>>() {})
+        .expectBody(
+            new ParameterizedTypeReference<DefaultServerResponse<Boolean, StandardError>>() {})
         .consumeWith(
             exchangeResult -> {
               var response = exchangeResult.getResponseBody();
@@ -213,7 +237,6 @@ public class ProfileRouterRestIT {
             exchangeResult -> {
               var response = exchangeResult.getResponseBody();
               assertNotNull(response);
-              System.out.println(response);
             });
   }
 }

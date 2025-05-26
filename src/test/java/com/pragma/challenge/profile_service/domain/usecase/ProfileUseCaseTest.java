@@ -1,28 +1,26 @@
 package com.pragma.challenge.profile_service.domain.usecase;
 
-import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.ProfileAlreadyExists;
-import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.TechnologiesNotFound;
-import com.pragma.challenge.profile_service.domain.model.Profile;
-import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
-import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
-import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.reactive.TransactionalOperator;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
-import java.util.Objects;
-
 import static com.pragma.challenge.profile_service.util.ProfileData.getProfileWithoutId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.ProfileAlreadyExists;
+import com.pragma.challenge.profile_service.domain.exceptions.standard_exception.TechnologiesNotFound;
+import com.pragma.challenge.profile_service.domain.model.Profile;
+import com.pragma.challenge.profile_service.domain.model.TechnologyProfileDto;
+import com.pragma.challenge.profile_service.domain.spi.ProfilePersistencePort;
+import com.pragma.challenge.profile_service.domain.spi.TechnologyServiceGateway;
+import java.util.Objects;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class ProfileUseCaseTest {
@@ -31,13 +29,10 @@ class ProfileUseCaseTest {
 
   @Mock ProfilePersistencePort profilePersistencePort;
   @Mock TechnologyServiceGateway technologyServiceGateway;
-  @Mock TransactionalOperator transactionalOperator;
 
   @Test
   void shouldRegisterProfile() {
     var profile = getProfileWithoutId();
-    when(transactionalOperator.transactional(any(Mono.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
     when(profilePersistencePort.validName(profile.name())).thenReturn(Mono.empty());
     when(technologyServiceGateway.technologiesExists(anyList())).thenReturn(Mono.just(true));
     when(profilePersistencePort.save(profile))
@@ -65,8 +60,6 @@ class ProfileUseCaseTest {
   @Test
   void shouldReturnProfileAlreadyExists() {
     var profile = getProfileWithoutId();
-    when(transactionalOperator.transactional(any(Mono.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
     when(profilePersistencePort.validName(profile.name()))
         .thenReturn(Mono.error(ProfileAlreadyExists::new));
 
@@ -81,8 +74,6 @@ class ProfileUseCaseTest {
   @Test
   void shouldReturnTechnologiesNotFound() {
     var profile = getProfileWithoutId();
-    when(transactionalOperator.transactional(any(Mono.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
     when(profilePersistencePort.validName(profile.name())).thenReturn(Mono.empty());
     when(technologyServiceGateway.technologiesExists(anyList())).thenReturn(Mono.just(false));
 

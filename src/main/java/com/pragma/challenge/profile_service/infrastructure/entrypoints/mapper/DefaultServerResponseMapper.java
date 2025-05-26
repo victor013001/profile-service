@@ -6,5 +6,5 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DefaultServerResponseMapper {
-  DefaultServerResponse<Object> toResponse(Object data);
+  DefaultServerResponse<Object, Object> toResponse(Object data, Object error);
 }
